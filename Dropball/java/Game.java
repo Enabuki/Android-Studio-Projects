@@ -1,14 +1,18 @@
 package com.example.dropball;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.view.KeyEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.Random;
@@ -31,6 +35,9 @@ public class Game extends AppCompatActivity {
     private ImageView ballImageView;
 
     private int currentBallPosition;
+
+    private AlertDialog.Builder dialogBuilder;
+    private AlertDialog alertDialog;
 
 
     @Override
@@ -66,7 +73,7 @@ public class Game extends AppCompatActivity {
                 resetUI();
                 animateBall();
             } else {
-                Toast.makeText(Game.this, "Please select a guess before starting the game.", Toast.LENGTH_SHORT).show();
+                showPopupMessage("Please select a guess before starting the game.");
             }
         }
     }
@@ -190,10 +197,10 @@ public class Game extends AppCompatActivity {
                 // Check if the selected guess button matches the ball position
                 if (isCorrectGuess) {
                     // You win! Implement the winning logic (e.g., show a message)
-                    Toast.makeText(Game.this, "Congratulations! You guessed correctly!", Toast.LENGTH_SHORT).show();
+                    showPopupMessage("Congratulations! You guessed correctly!");
                 } else {
                     // Implement the logic for when the guessed position is incorrect
-                    Toast.makeText(Game.this, "Sorry! You guessed incorrectly.", Toast.LENGTH_SHORT).show();
+                    showPopupMessage("Sorry! You guessed incorrectly.");
                 }
 
                 // Enable all guess buttons after showing the result
@@ -210,7 +217,7 @@ public class Game extends AppCompatActivity {
                     launchNextActivity(score);
                 } else {
                     // Show the remaining attempts
-                    Toast.makeText(Game.this, "Remaining Attempts: " + remainingAttempts, Toast.LENGTH_SHORT).show();
+                    showPopupMessage("Remaining Attempts: " + remainingAttempts);
                 }
             }
         }
@@ -234,6 +241,52 @@ public class Game extends AppCompatActivity {
         finish(); // Optional: Finish the current activity to prevent going back.
     }
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        if (keyCode == KeyEvent.KEYCODE_BACK) {
+            showExitConfirmationDialog();
+            return true;
+        }
+        return super.onKeyDown(keyCode, event);
+    }
+
+
+    private void showExitConfirmationDialog() {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.exit_dialog, null);
+        dialogBuilder.setView(dialogView);
+
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+        Button btnOkay = dialogView.findViewById(R.id.btnOkay);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+
+        btnCancel.setOnClickListener(v -> alertDialog.dismiss());
+        btnOkay.setOnClickListener(v -> {
+            finish();
+        });
+    }
+
+    private void showPopupMessage(String message) {
+        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+        View dialogView = getLayoutInflater().inflate(R.layout.pop_up_message, null);
+        dialogBuilder.setView(dialogView);
+
+        TextView dialogMessage = dialogView.findViewById(R.id.dialog_message);
+        dialogMessage.setText(message);
+
+        Button btnCancel = dialogView.findViewById(R.id.btnCancel);
+        Button btnOkay = dialogView.findViewById(R.id.btnOkay);
+
+        AlertDialog alertDialog = dialogBuilder.create();
+        alertDialog.show();
+
+        btnCancel.setOnClickListener(v -> alertDialog.dismiss());
+        btnOkay.setOnClickListener(v -> alertDialog.dismiss()); // Modify this based on what "Okay" should do
+    }
+
+
 
     public void onGuessButtonClick(View view) {
         Button button = (Button) view;
@@ -252,7 +305,7 @@ public class Game extends AppCompatActivity {
                 selectedCount--;
             } else {
                 // Another button is already selected, show message
-                Toast.makeText(Game.this, "You have already selected a guess.", Toast.LENGTH_SHORT).show();
+                showPopupMessage("You have already selected a guess.");
             }
 
             // Remove background tint
