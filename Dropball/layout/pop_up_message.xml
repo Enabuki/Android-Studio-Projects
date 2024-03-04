@@ -8,7 +8,7 @@
     android:layout_margin="85dp"
     android:gravity="center"
     android:layout_gravity="center">
-    
+
     <TextView
         android:id="@+id/dialog_message"
         android:layout_width="match_parent"
@@ -21,7 +21,7 @@
         android:textSize="13dp"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,14 +35,14 @@
             android:layout_height="wrap_content"
             android:layout_marginRight="20dp"
             android:onClick="cancelExit"
-            android:text="Cancel" /> 
+            android:text="Cancel" />
 
         <Button
             android:id="@+id/btnOkay"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:onClick="okayExit"
-            android:text="Okay" /> 
+            android:text="Okay" />
 
     </LinearLayout>
 
