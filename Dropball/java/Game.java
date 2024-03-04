@@ -5,60 +5,62 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.view.KeyEvent;
 import android.view.View;
+
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-
+import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+
 
 import java.util.Random;
 
 public class Game extends AppCompatActivity {
 
     private ImageView[] boxes = new ImageView[6];
-    private Button[] guessButtons = new Button[6];
+    private Button[] guessButtons = new Button[6];  // Changed to Button
     private Button startButton;
-
-    private int selectedCount = 0; // Tracks the number of selected guess buttons
-
-    private int remainingAttempts = 3;
-
-    private Button selectedButton = null;
 
     private int ballPosition;
     private boolean animationInProgress = false;
+    private int remainingAttempts = 3;
 
     private ImageView ballImageView;
 
-    private int currentBallPosition;
+    private int totalScore = 0;
 
-    private AlertDialog.Builder dialogBuilder;
-    private AlertDialog alertDialog;
+    private int selectedGuess = -1; // -1 indicates no guess selected
 
+    private int currentBallPosition; // Add this variable
+    private Button selectedButton = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-
         startButton = findViewById(R.id.startButton);
 
+        // Initialize image views for boxes
         for (int i = 0; i < 6; i++) {
             int boxId = getResources().getIdentifier("box" + (i + 1), "id", getPackageName());
             boxes[i] = findViewById(boxId);
-
-            int buttonId = getResources().getIdentifier("guessButton" + (i + 1), "id", getPackageName());
-            guessButtons[i] = findViewById(buttonId);
-            guessButtons[i].setTag(false); // Initialize button tag to false
         }
 
-        ballImageView = findViewById(R.id.ballImageView);
-    }
+        // Initialize guess buttons
+        for (int i = 0; i < 6; i++) {
+            int buttonId = getResources().getIdentifier("guessButton" + (i + 1), "id", getPackageName());
+            guessButtons[i] = findViewById(buttonId);
+        }
 
+        resetAttempts();
+        ballImageView = findViewById(R.id.ballImageView);
+
+    }
 
     public void goToInstructions4(View v) {
         Intent i = new Intent(this, Instructions4.class);
@@ -68,27 +70,25 @@ public class Game extends AppCompatActivity {
 
     public void startGame(View view) {
         if (!animationInProgress) {
-            if (selectedButton != null) {
-                resetUI();
-                animateBall();
-            } else {
+            // Check if at least one guess button is selected
+            boolean isAnyButtonSelected = false;
+            for (Button button : guessButtons) {
+                if (button.isSelected()) {
+                    isAnyButtonSelected = true;
+                    break;
+                }
+            }
+
+            if (!isAnyButtonSelected) {
                 showPopupMessage("Please select a guess before starting the game.");
+                return;
             }
+
+            // Reset UI and start the ball animation
+            resetUI();
+            animateBall();
         }
     }
-
-
-    private int countSelectedGuesses() {
-        int count = 0;
-        for (Button button : guessButtons) {
-            boolean isSelected = (boolean) button.getTag();
-            if (isSelected) {
-                count++;
-            }
-        }
-        return count;
-    }
-
 
     private void resetUI() {
         // Reset UI elements to their initial state
@@ -111,7 +111,7 @@ public class Game extends AppCompatActivity {
         ballPosition = random.nextInt(6);
         currentBallPosition = ballPosition; // Store the initial ball position
 
-        int animationDuration = 5000; // 5 seconds
+        int animationDuration = 2000; // 2 seconds (adjust as needed)
         int numberOfDisappearances = 5;
 
         // Calculate the interval between each disappearance and reappearance
@@ -156,6 +156,7 @@ public class Game extends AppCompatActivity {
         animationInProgress = true;
     }
 
+
     // Modify setBallPosition method to use currentBallPosition
     private void setBallPosition() {
         int[] boxLeftMargins = {13, 150, 250, 350, 450, 550}; // Adjust these margins as needed
@@ -183,14 +184,20 @@ public class Game extends AppCompatActivity {
                 // Set the image directly for the box that corresponds to the ball position
                 boxes[currentBallPosition].setImageResource(R.drawable.bola);
 
-                boolean isCorrectGuess = false;
+                boolean isCorrectGuess = selectedGuess == currentBallPosition;
 
                 // Check which guess button is selected
                 for (int i = 0; i < 6; i++) {
                     if (guessButtons[i].isSelected()) {
-                        isCorrectGuess = i == currentBallPosition;
+                        // Compare the index of the selected button with the ball position
+                        isCorrectGuess = i + 1 == currentBallPosition + 1; // Add 1 to align with box indices
                         break;
                     }
+                }
+
+                // Enable all guess buttons before showing the result
+                for (Button button : guessButtons) {
+                    button.setEnabled(true);
                 }
 
                 // Check if the selected guess button matches the ball position
@@ -202,40 +209,33 @@ public class Game extends AppCompatActivity {
                     showPopupMessage("Sorry! You guessed incorrectly.");
                 }
 
-                // Enable all guess buttons after showing the result
-                for (Button button : guessButtons) {
-                    button.setEnabled(true);
-                }
-
                 // Calculate the score
                 int score = calculateScore(isCorrectGuess, currentBallPosition);
-                remainingAttempts--;
+                totalScore += score; // Increment the total score
+                remainingAttempts--; // Decrease remaining attempts
 
                 if (remainingAttempts <= 0) {
                     // Launch NextActivity with the total attempts and score
-                    launchNextActivity(score);
+                    launchNextActivity(totalScore);
                 } else {
                     // Show the remaining attempts
-                    showPopupMessage("Remaining Attempts: " + remainingAttempts);
+                    Toast.makeText(Game.this, "Remaining Attempts: " + remainingAttempts, Toast.LENGTH_SHORT).show();
                 }
             }
         }
     }
 
+
     // Modify the calculateScore method to take a boolean parameter indicating correct guess
     private int calculateScore(boolean isCorrectGuess, int ballPosition) {
-        // Implement your scoring logic here
-        // For example, you can deduct points for each incorrect guess
-        // and provide bonus points for correct guesses.
-        // Adjust this logic based on your game's scoring rules.
-        // For simplicity, let's assume each correct guess gives 10 points.
-        return isCorrectGuess ? 10 : 0;
+        // Adjust your scoring logic as needed
+        return isCorrectGuess ? 1 : 0;
     }
 
     private void launchNextActivity(int score) {
         Intent intent = new Intent(Game.this, Results.class);
         intent.putExtra("totalAttempts", 3); // Always send the total attempts as 3
-        intent.putExtra("totalScore", score);
+        intent.putExtra("totalScore", score); // Pass the score as an extra
         startActivity(intent);
         finish(); // Optional: Finish the current activity to prevent going back.
     }
@@ -255,20 +255,34 @@ public class Game extends AppCompatActivity {
         View dialogView = getLayoutInflater().inflate(R.layout.exit_dialog, null);
         dialogBuilder.setView(dialogView);
 
+        // Button references
         Button btnCancel = dialogView.findViewById(R.id.btnCancel);
         Button btnOkay = dialogView.findViewById(R.id.btnOkay);
 
+        // Create AlertDialog
         AlertDialog alertDialog = dialogBuilder.create();
         alertDialog.show();
 
-        btnCancel.setOnClickListener(v -> alertDialog.dismiss());
-        btnOkay.setOnClickListener(v -> {
-            finish();
+        // Set click listener for the cancel button
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss(); // Dismiss the dialog
+            }
+        });
+
+        // Set click listener for the okay button
+        btnOkay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                stopService(new Intent(Game.this, MusicService.class));
+                finish();
+            }
         });
     }
 
     private void showPopupMessage(String message) {
-        AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
+            AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(this);
         View dialogView = getLayoutInflater().inflate(R.layout.pop_up_message, null);
         dialogBuilder.setView(dialogView);
 
@@ -286,31 +300,24 @@ public class Game extends AppCompatActivity {
     }
 
 
-
     public void onGuessButtonClick(View view) {
         Button button = (Button) view;
-        if (!animationInProgress) {
-            if (selectedButton == null) {
-                // No button selected, select the clicked button
-                selectedButton = button;
+
+        // Reset the state of all guess buttons and find which button was clicked
+        for (int i = 0; i < guessButtons.length; i++) {
+            guessButtons[i].setSelected(false); // You might not need to visually deselect, but ensure consistent logic
+            guessButtons[i].setBackgroundResource(android.R.color.transparent);
+
+            if (view.getId() == guessButtons[i].getId()) {
+                selectedGuess = i; // Store the index of the selected button
+                selectedButton = guessButtons[i]; // Store the reference to the selected button
                 selectedButton.setBackgroundResource(R.drawable.button_selected_background);
-                selectedButton.setTag(true);
-                selectedCount++;
-            } else if (selectedButton.getId() == button.getId()) {
-                // Deselect the clicked button
-                selectedButton.setBackgroundResource(android.R.color.transparent);
-                selectedButton.setTag(false);
-                selectedButton = null;
-                selectedCount--;
-            } else {
-                // Another button is already selected, show message
-                showPopupMessage("You have already selected a guess.");
+                view.setSelected(true); // This is for your logic, might not change visual state
             }
 
-            // Remove background tint
             button.setBackgroundTintList(null);
-
         }
-
     }
+
+
 }
