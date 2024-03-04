@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_width="match_parent"
     tools:context=".Game"
     android:id="@+id/relativeLayout"
     >
@@ -12,11 +12,12 @@
         android:layout_height="match_parent"
         android:background="@drawable/game" />
 
+
     <Button
-        android:layout_width="90dp"
-        android:layout_height="90dp"
-        android:layout_marginTop="45dp"
-        android:layout_marginLeft="315dp"
+        android:layout_width="80dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginLeft="330dp"
         android:background="@android:color/transparent"
         android:onClick="goToInstructions4" />
 
@@ -35,33 +36,56 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="130dp"
-        android:layout_marginTop="200dp"
+        android:layout_marginTop="195dp"
         android:background="@android:color/transparent"
         android:weightSum="9"
         android:orientation="horizontal">
-
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
             android:orientation="horizontal"
             android:gravity="center">
-
+            <ImageView
+                android:id="@+id/box1"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:background="@drawable/meme1"
+                />
         </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="3"
-            android:layout_marginTop="5dp"
-            android:orientation="horizontal">
-
+            android:orientation="horizontal"
+            android:gravity="center">
+            <ImageView
+                android:id="@+id/box2"
+                android:layout_width="140dp"
+                android:layout_height="140dp"
+                android:background="@drawable/meme2"
+                />
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="3"
+            android:orientation="horizontal"
+            >
+            <ImageView
+                android:id="@+id/box3"
+                android:layout_width="108dp"
+                android:layout_height="130dp"
+                android:layout_marginTop="-2dp"
+                android:background="@drawable/meme3"
+                />
         </LinearLayout>
 
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="130dp"
-        android:layout_marginTop="330dp"
+        android:layout_height="135dp"
+        android:layout_marginTop="320dp"
         android:background="@android:color/transparent"
         android:weightSum="9"
         android:orientation="horizontal">
@@ -72,6 +96,12 @@
             android:orientation="horizontal"
             >
 
+            <ImageView
+                android:id="@+id/box4"
+                android:layout_width="100dp"
+                android:layout_height="120dp"
+                android:layout_marginLeft="15dp"
+                android:background="@drawable/meme4" />
         </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"
@@ -79,7 +109,13 @@
             android:layout_weight="3"
             android:orientation="horizontal"
             >
-
+            <ImageView
+                android:id="@+id/box5"
+                android:layout_width="125dp"
+                android:layout_height="120dp"
+                android:layout_marginLeft="-5dp"
+                android:background="@drawable/meme5"
+                />
         </LinearLayout>
         <LinearLayout
             android:layout_width="0dp"
@@ -87,12 +123,19 @@
             android:layout_weight="3"
             android:orientation="horizontal"
             >
-
+            <ImageView
+                android:id="@+id/box6"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:layout_marginLeft="-5dp"
+                android:background="@drawable/meme6"
+                />
         </LinearLayout>
 
     </LinearLayout>
 
     <!-- Add these buttons below the startButton in activity_main.xml -->
+
 
     <Button
         android:id="@+id/guessButton1"
@@ -159,8 +202,8 @@
 
     <ImageView
         android:id="@+id/ballImageView"
-        android:layout_width="110dp"
-        android:layout_height="110dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
         android:layout_marginTop="210dp"
         android:layout_marginLeft="13dp"
         android:src="@drawable/bola"
