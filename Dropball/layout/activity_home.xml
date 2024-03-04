@@ -23,7 +23,7 @@
         android:onClick="goToDevelopers" />
 
 
-    
+
     <Button
         android:layout_width="300dp"
         android:layout_height="wrap_content"
